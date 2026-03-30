@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
             if (token) {
                 try {
                     // Assuming there's a /me endpoint to get user info from token
-                    const response = await axios.get('http://localhost:3000/api/auth/get-me', {
+                    const response = await axios.get('https://apna-member-backend.onrender.com/api/auth/get-me', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setUser(response.data.user);
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     const handleLogin = useCallback(async (username, password) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3000/api/auth/login', {
+            const response = await axios.post('https://apna-member-backend.onrender.com/api/auth/login', {
                 username,
                 password
             });
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     const handleRegister = useCallback(async (userData) => {
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3000/api/auth/register', userData);
+            const response = await axios.post('https://apna-member-backend.onrender.com/api/auth/register', userData);
             setUser(response.data.user);
             localStorage.setItem('token', response.data.token);
             return true;
