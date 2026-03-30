@@ -5,8 +5,22 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://apna-member.onrender.com'],
-    credentials: true
+   origin: (origin, callback) => {
+        const allowedOrigins = [
+            'http://localhost:5173', 
+            'http://localhost:5174', 
+            'https://apna-member.onrender.com'
+        ];
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 app.use(express.json());
 
