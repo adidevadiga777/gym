@@ -9,13 +9,15 @@ app.use(cors({
         const allowedOrigins = [
             'http://localhost:5173', 
             'http://localhost:5174', 
-            'http://192.168.1.2:5173', // Add your laptop's IP
+            'http://192.168.1.2:5173',
             'http://192.168.1.2:5174',
             'https://apna-member.onrender.com'
         ];
-        if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://192.168.')) {
+        // Allow if in list, if local network, or if it's any Render subdomain
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com') || origin.startsWith('http://192.168.')) {
             callback(null, true);
         } else {
+            console.log("CORS Blocked Origin:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
