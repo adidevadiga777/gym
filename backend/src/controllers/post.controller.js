@@ -40,26 +40,24 @@ async function createPostController(req, res) {
             user: req.user.id
         })
 
-        // Send Email to the new member
-        try {
-            await sendMail({
-                to: req.body.email,
-                subject: "Gym Membership Confirmed!",
-                html: `
-                    <h2>Hello ${req.body.name}!</h2>
-                    <p>Your gym membership has been successfully activated.</p>
-                    <p><strong>Membership Details:</strong></p>
-                    <ul>
-                        <li><strong>Plan:</strong> ${req.body.planName}</li>
-                        <li><strong>Joining Date:</strong> ${dateOfJoin.toDateString()}</li>
-                        <li><strong>Expiry Date:</strong> ${expiryDate.toDateString()}</li>
-                    </ul>
-                    <p>Team ${req.user.username}</p>
-                `
-            });
-        } catch (mailError) {
-            console.error("Delayed Notification: Could not send joining email to " + req.body.email, mailError.message);
-        }
+        // Send Email in the background so the request doesn't hang
+        sendMail({
+            to: req.body.email,
+            subject: "Gym Membership Confirmed!",
+            html: `
+                <h2>Hello ${req.body.name}!</h2>
+                <p>Your gym membership has been successfully activated.</p>
+                <p><strong>Membership Details:</strong></p>
+                <ul>
+                    <li><strong>Plan:</strong> ${req.body.planName}</li>
+                    <li><strong>Joining Date:</strong> ${dateOfJoin.toDateString()}</li>
+                    <li><strong>Expiry Date:</strong> ${expiryDate.toDateString()}</li>
+                </ul>
+                <p>Team ${req.user.username}</p>
+            `
+        }).catch(mailError => {
+            console.error("Background Notification Error: Could not send joining email to " + req.body.email, mailError.message);
+        });
 
         res.status(201).json({
             message: "Member added and confirmation email attempted.",

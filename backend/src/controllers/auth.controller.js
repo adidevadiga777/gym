@@ -35,23 +35,19 @@ async function registerController(req, res) {
     )
     res.cookie('token', token)
 
-    let emailSent = false;
-    try {
-        await sendMail({
-            to: email,
-            subject: "Welcome to Apna Member",
-            html: `<p>Hello ${username},</p>
-                <p>Thank you for joining Apna Member!</p>
-            <p>Best regards,<br>Apna Member Team</p>`
-        })
-        emailSent = true;
-    } catch (error) {
-        console.error("Email could not be sent to: " + email, error)
-    }
+    // Send Welcome Email in the background
+    sendMail({
+        to: email,
+        subject: "Welcome to Apna Member",
+        html: `<p>Hello ${username},</p>
+            <p>Thank you for joining Apna Member!</p>
+        <p>Best regards,<br>Apna Member Team</p>`
+    }).catch(error => {
+        console.error("Delayed Notification: Could not send registration email to " + email, error.message);
+    });
 
     res.status(201).json({
-        message: 'User registered successfully' + (emailSent ? '' : ' (but welcome email could not be sent)'),
-        emailSent,
+        message: 'User registered successfully',
         token,
         user: {
             id: user._id,
