@@ -105,6 +105,7 @@ async function loginController(req, res) {
             message: "User loggedIn successfully.",
             token,
             user: {
+                id: user._id,
                 username: user.username,
                 email: user.email,
                 bio: user.bio,

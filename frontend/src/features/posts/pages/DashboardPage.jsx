@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { useNavigate } from 'react-router';
+import { API_URL } from '../../../config';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import {
   Dumbbell,
@@ -24,6 +25,7 @@ const DashboardPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   const [newMember, setNewMember] = useState({
     name: '',
@@ -44,8 +46,9 @@ const DashboardPage = () => {
 
     const fetchMembers = async () => {
       try {
+        setFetchError(null);
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/api/posts', {
+        const response = await axios.get(`${API_URL}/posts`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -72,6 +75,7 @@ const DashboardPage = () => {
         setMembers(mappedMembers);
       } catch (error) {
         console.error("Error fetching members:", error);
+        setFetchError(error.response?.data?.message || error.message);
       } finally {
         setLoadingDashboard(false);
       }
@@ -123,7 +127,7 @@ const DashboardPage = () => {
       formData.append("chacha", newMember.image);
 
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:3000/api/posts', formData, {
+      const response = await axios.post(`${API_URL}/posts`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -319,7 +323,18 @@ const DashboardPage = () => {
 
           {/* Member List */}
           <div className="member-list">
-            {filteredMembers.length > 0 ? (
+            {fetchError ? (
+              <div className="p-8 text-center text-red-400 bg-red-900/10 rounded-xl border border-red-900/30">
+                <p className="font-medium">Error loading members</p>
+                <p className="text-sm opacity-80">{fetchError}</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/40 rounded-lg text-sm transition-all"
+                >
+                  Retry Connection
+                </button>
+              </div>
+            ) : filteredMembers.length > 0 ? (
               filteredMembers.map((member) => (
                 <div key={member.id} className="member-item">
                   <div className="member-info">
