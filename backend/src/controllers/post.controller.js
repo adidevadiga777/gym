@@ -53,7 +53,8 @@ async function createPostController(req, res) {
                     <li><strong>Joining Date:</strong> ${dateOfJoin.toDateString()}</li>
                     <li><strong>Expiry Date:</strong> ${expiryDate.toDateString()}</li>
                 </ul>
-                <p>Team ${req.user.username}</p>
+                <p>Best Regards,</p>
+                <p> Team <strong>${req.user.username}</strong></p>
             `
         }).catch(mailError => {
             console.error("Background Notification Error: Could not send joining email to " + req.body.email, mailError.message);

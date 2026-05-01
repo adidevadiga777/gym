@@ -71,6 +71,18 @@ const Login = () => {
             {submitting ? "Please wait..." : "Login"}
           </button>
         </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBlock: '0.5rem' }}>
+          <div style={{ flex: 1, height: '1px', background: '#444' }}></div>
+          <span style={{ fontSize: '12px', color: '#888', fontWeight: 'bold' }}>OR</span>
+          <div style={{ flex: 1, height: '1px', background: '#444' }}></div>
+        </div>
+
+        <a href="http://localhost:3000/api/auth/google" className="google-button">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+          <span>Login with Google</span>
+        </a>
+
         <p>Don't have an account? <Link to='/register'>Create an account.</Link></p>
       </div>
     </main>

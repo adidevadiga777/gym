@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { API_URL } from '../../config';
+import { API_URL } from '../../config'; 
 
 export const AuthContext = createContext();
 
@@ -11,6 +11,16 @@ export const AuthProvider = ({ children }) => {
     // Check for token on mount
     useEffect(() => {
         const checkAuth = async () => {
+            // Check if token is in URL (callback from Google Auth)
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+            
+            if (urlToken) {
+                localStorage.setItem('token', urlToken);
+                // Clear URL params
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             const token = localStorage.getItem('token');
             if (token) {
                 try {

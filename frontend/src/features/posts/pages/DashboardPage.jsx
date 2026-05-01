@@ -14,7 +14,10 @@ import {
   Calendar,
   UserCheck,
   UserX,
-  LogOut
+  LogOut,
+  Camera,
+  User as UserIcon,
+  ChevronDown
 } from 'lucide-react';
 
 
@@ -24,6 +27,12 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddMember, setShowAddMember] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({
+    username: user?.username || '',
+    image: null
+  });
   const [loadingDashboard, setLoadingDashboard] = useState(true);
   const [fetchError, setFetchError] = useState(null);
 
@@ -85,6 +94,16 @@ const DashboardPage = () => {
       fetchMembers();
     }
   }, [user, authLoading, navigate]);
+
+  // Sync profile data when user loads
+  useEffect(() => {
+    if (user && !editProfileData.username) {
+      setEditProfileData(prev => ({
+        ...prev,
+        username: user.username || user.name || ''
+      }));
+    }
+  }, [user]);
 
   // Dynamically calculate earnings data from members list
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -162,6 +181,37 @@ const DashboardPage = () => {
     }
   };
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (!editProfileData.username || isUpdatingProfile) return;
+
+    setIsUpdatingProfile(true);
+    try {
+      const formData = new FormData();
+      formData.append('username', editProfileData.username);
+      if (editProfileData.image) {
+        formData.append('profileImage', editProfileData.image);
+      }
+
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_URL}/users/profile`, formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}` 
+        }
+      });
+
+      alert("Profile updated successfully!");
+      setShowProfileModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert(error.response?.data?.message || "Failed to update profile.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -184,11 +234,40 @@ const DashboardPage = () => {
               <span className="logo-text">Apna Member</span>
             </div>
             <div className="nav-actions">
-              <span className="welcome-text">Welcome, {user?.username || user?.name || "Admin"}</span>
-              <button onClick={logout} className="logout-btn">
-                <LogOut className="h-4 w-4 mr-1.5" />
-                Logout
-              </button>
+              <div 
+                className="admin-profile-trigger-unique" 
+                onClick={() => setShowProfileModal(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+              >
+                <div 
+                  className="admin-avatar-wrapper-unique"
+                  style={{ 
+                    width: '40px', 
+                    height: '40px', 
+                    borderRadius: '50%', 
+                    overflow: 'hidden', 
+                    backgroundColor: '#004238',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  {user?.profileImage ? (
+                    <img 
+                      src={user.profileImage} 
+                      alt="Admin" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    <div style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>
+                      {(user?.username || user?.name || "A").charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <ChevronDown style={{ width: '16px', height: '16px', color: 'white', opacity: 0.8 }} />
+              </div>
             </div>
           </div>
         </div>
@@ -435,6 +514,94 @@ const DashboardPage = () => {
               <div className="form-actions">
                 <button type="button" onClick={() => setShowAddMember(false)} className="btn-cancel">Cancel</button>
                 <button type="submit" className="btn-save">Save Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <div className="modal-overlay">
+          <div className="modal-card profile-modal">
+            <div className="modal-header">
+              <h3>Edit Admin Profile</h3>
+              <button onClick={() => setShowProfileModal(false)} className="btn-close">&times;</button>
+            </div>
+
+            <form onSubmit={handleUpdateProfile} className="modal-form">
+              <div className="profile-upload-section">
+                <div 
+                  className="profile-preview-box" 
+                  onClick={() => document.getElementById('profile-image-upload').click()}
+                  style={{ 
+                    width: '120px', 
+                    height: '120px', 
+                    borderRadius: '50%', 
+                    overflow: 'hidden',
+                    border: '3px solid #262626',
+                    position: 'relative'
+                  }}
+                >
+                  {editProfileData.image ? (
+                    <img 
+                      src={URL.createObjectURL(editProfileData.image)} 
+                      alt="Preview" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  ) : user?.profileImage ? (
+                    <img 
+                      src={user.profileImage} 
+                      alt="Current" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    <div className="preview-placeholder">
+                      <Camera className="h-8 w-8" />
+                    </div>
+                  )}
+                  <div className="upload-overlay">
+                    <Camera className="h-5 w-5" />
+                  </div>
+                </div>
+                <input 
+                  type="file" 
+                  id="profile-image-upload" 
+                  hidden 
+                  accept="image/*"
+                  onChange={(e) => setEditProfileData({ ...editProfileData, image: e.target.value ? e.target.files[0] : null })}
+                />
+                <p className="upload-hint">Click to change profile photo</p>
+              </div>
+
+              <div className="form-group">
+                <label>Admin Username</label>
+                <input
+                  type="text"
+                  required
+                  value={editProfileData.username}
+                  onChange={(e) => setEditProfileData({ ...editProfileData, username: e.target.value })}
+                  placeholder="Enter new username"
+                />
+              </div>
+
+              <div className="modal-divider"></div>
+
+              <div className="modal-actions-column">
+                <button 
+                  type="submit" 
+                  className="btn-save-full"
+                  disabled={isUpdatingProfile}
+                >
+                  {isUpdatingProfile ? "Saving..." : "Save Changes"}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={logout}
+                  className="btn-logout-full"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout from Session
+                </button>
               </div>
             </form>
           </div>

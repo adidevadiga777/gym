@@ -27,8 +27,23 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 app.use(express.json());
-
 app.use(cookieParser());
+
+const session = require('express-session');
+const passport = require('./config/passport');
+
+app.use(session({
+    secret: process.env.JWT_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 const authRoutes = require('./routes/auth.routes');
 const postRoutes = require('./routes/post.routes');
