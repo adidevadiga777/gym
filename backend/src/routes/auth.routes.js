@@ -34,7 +34,8 @@ authRouter.get('/google/callback',
         );
         res.cookie('token', token);
         // Redirect to frontend dashboard or home
-        res.redirect(`http://localhost:5173/?token=${token}`);
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        res.redirect(`${clientUrl}/?token=${token}`);
     }
 );
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import "../style/form.scss"
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
+import { BASE_URL } from '../../../config'
 
 const Login = () => {
   const { user, loading, handleLogin } = useAuth()
@@ -78,7 +79,7 @@ const Login = () => {
           <div style={{ flex: 1, height: '1px', background: '#444' }}></div>
         </div>
 
-        <a href="http://localhost:3000/api/auth/google" className="google-button">
+        <a href={`${BASE_URL}/api/auth/google`} className="google-button">
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
           <span>Login with Google</span>
         </a>
