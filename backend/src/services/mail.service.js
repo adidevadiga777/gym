@@ -1,10 +1,15 @@
 const nodemailer = require("nodemailer");
 
 const transporterConfig = {
-    service: 'gmail',
+    host: 'smtp.googlemail.com',
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.GOOGLE_USER,
     },
+    tls: {
+        rejectUnauthorized: false
+    }
 };
 
 if (process.env.GOOGLE_PASS) {
