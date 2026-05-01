@@ -1,19 +1,10 @@
 const nodemailer = require("nodemailer");
 
 const transporterConfig = {
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    family: 4,
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,   // 10 seconds
+    service: 'gmail',
     auth: {
         user: process.env.GOOGLE_USER,
     },
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    }
 };
 
 if (process.env.GOOGLE_PASS) {
