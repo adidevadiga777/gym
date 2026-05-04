@@ -8,11 +8,9 @@ app.set('trust proxy', 1);
 app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = [
-            'http://localhost:5173', 
-            'http://localhost:5174', 
-            'http://192.168.1.2:5173',
-            'http://192.168.1.2:5174',
-            'https://apna-member.onrender.com'
+            'http://localhost:5173',
+            'https://www.apna-member.in',
+            'https://apna-member.in'
         ];
         // Allow if in list, if local network, or if it's any Render subdomain
         if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com') || origin.startsWith('http://192.168.')) {
