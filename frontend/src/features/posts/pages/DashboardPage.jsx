@@ -114,7 +114,7 @@ const DashboardPage = () => {
         return !isNaN(joinDate) && joinDate.getMonth() === index;
       })
       .reduce((sum, member) => sum + member.amount, 0);
-    
+
     return { month, earnings: monthEarnings };
   });
 
@@ -132,6 +132,23 @@ const DashboardPage = () => {
 
   const handleAddMember = async (e) => {
     e.preventDefault();
+
+    if (!newMember.name.trim()) {
+      alert("Please enter the member's full name.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!newMember.email.trim() || !emailRegex.test(newMember.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!newMember.phone.trim() || newMember.phone.trim().length < 10) {
+      alert("Please enter a valid phone number with at least 10 digits.");
+      return;
+    }
+
     if (!newMember.image) {
       alert("Please select an image for the member.");
       return;
@@ -195,9 +212,9 @@ const DashboardPage = () => {
 
       const token = localStorage.getItem('token');
       await axios.put(`${API_URL}/users/profile`, formData, {
-        headers: { 
+        headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}` 
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -234,18 +251,18 @@ const DashboardPage = () => {
               <span className="logo-text">Apna Member</span>
             </div>
             <div className="nav-actions">
-              <div 
-                className="admin-profile-trigger-unique" 
+              <div
+                className="admin-profile-trigger-unique"
                 onClick={() => setShowProfileModal(true)}
                 style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
               >
-                <div 
+                <div
                   className="admin-avatar-wrapper-unique"
-                  style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    borderRadius: '50%', 
-                    overflow: 'hidden', 
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
                     backgroundColor: '#004238',
                     border: '1px solid rgba(255,255,255,0.1)',
                     display: 'flex',
@@ -255,9 +272,9 @@ const DashboardPage = () => {
                   }}
                 >
                   {user?.profileImage ? (
-                    <img 
-                      src={user.profileImage} 
-                      alt="Admin" 
+                    <img
+                      src={user.profileImage}
+                      alt="Admin"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                     />
                   ) : (
@@ -406,8 +423,8 @@ const DashboardPage = () => {
               <div className="p-8 text-center text-red-400 bg-red-900/10 rounded-xl border border-red-900/30">
                 <p className="font-medium">Error loading members</p>
                 <p className="text-sm opacity-80">{fetchError}</p>
-                <button 
-                  onClick={() => window.location.reload()} 
+                <button
+                  onClick={() => window.location.reload()}
                   className="mt-4 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/40 rounded-lg text-sm transition-all"
                 >
                   Retry Connection
@@ -530,28 +547,28 @@ const DashboardPage = () => {
 
             <form onSubmit={handleUpdateProfile} className="modal-form">
               <div className="profile-upload-section">
-                <div 
-                  className="profile-preview-box" 
+                <div
+                  className="profile-preview-box"
                   onClick={() => document.getElementById('profile-image-upload').click()}
-                  style={{ 
-                    width: '120px', 
-                    height: '120px', 
-                    borderRadius: '50%', 
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
                     overflow: 'hidden',
                     border: '3px solid #262626',
                     position: 'relative'
                   }}
                 >
                   {editProfileData.image ? (
-                    <img 
-                      src={URL.createObjectURL(editProfileData.image)} 
-                      alt="Preview" 
+                    <img
+                      src={URL.createObjectURL(editProfileData.image)}
+                      alt="Preview"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                     />
                   ) : user?.profileImage ? (
-                    <img 
-                      src={user.profileImage} 
-                      alt="Current" 
+                    <img
+                      src={user.profileImage}
+                      alt="Current"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                     />
                   ) : (
@@ -563,10 +580,10 @@ const DashboardPage = () => {
                     <Camera className="h-5 w-5" />
                   </div>
                 </div>
-                <input 
-                  type="file" 
-                  id="profile-image-upload" 
-                  hidden 
+                <input
+                  type="file"
+                  id="profile-image-upload"
+                  hidden
                   accept="image/*"
                   onChange={(e) => setEditProfileData({ ...editProfileData, image: e.target.value ? e.target.files[0] : null })}
                 />
@@ -587,15 +604,15 @@ const DashboardPage = () => {
               <div className="modal-divider"></div>
 
               <div className="modal-actions-column">
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn-save-full"
                   disabled={isUpdatingProfile}
                 >
                   {isUpdatingProfile ? "Saving..." : "Save Changes"}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={logout}
                   className="btn-logout-full"
                 >
